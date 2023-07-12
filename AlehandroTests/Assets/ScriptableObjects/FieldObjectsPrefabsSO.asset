@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: caaff61af4c37cf43851437527b298f8, type: 3}
+  m_Name: FieldObjectsPrefabsSO
+  m_EditorClassIdentifier: 
+  BlueTokenPrefab: {fileID: 7928861185078144575, guid: 05d34366e9c48034c90299b56d2707e8, type: 3}
+  BlueTokenSprite: {fileID: 21300000, guid: 7bebeff7b8e8d7d4485653f20bfb278b, type: 3}
+  GreenTokenPrefab: {fileID: 7520614174509472931, guid: 7d0bb6ddf19132b40a489e74e9ac05a8, type: 3}
+  GreenTokenSprite: {fileID: 21300000, guid: 5c38ae2af10223d4b9601f1647374efc, type: 3}
+  OrangeTokenPrefab: {fileID: 818743284738398898, guid: eab0c89cd1ab9b94bace1940ed7cba1b, type: 3}
+  OrangeTokenSprite: {fileID: 21300000, guid: c0163cc599c29494ab3c66ee96216182, type: 3}
+  RedTokenPrefab: {fileID: 4662319286026820835, guid: c20f75eda1f66c64a8c85458351cb12f, type: 3}
+  RedTokenSprite: {fileID: 21300000, guid: 09eb8e283b6bea84cb9d6e7a93586901, type: 3}
+  YelowTokenPrefab: {fileID: 4662319286026820835, guid: aa748b170a6729b499e6f744d5c4c6d6, type: 3}
+  YelowTokenSprite: {fileID: 21300000, guid: 493211ab046192d449149df8e5439495, type: 3}
+  IceObstaclePrefab: {fileID: 7307187480907624077, guid: c293a08132935904182dcefdda8e2c13, type: 3}
+  IceObstacleSprite: {fileID: 21300000, guid: 43861aba0f8b9cc489da3f9a146494aa, type: 3}
+  RockObstaclePrefab: {fileID: 7307187480907624077, guid: cbb3f2e1d782dc944bcefd30ab10a40e, type: 3}
+  RockObstacleSprite: {fileID: 21300000, guid: 576fe629e83cc6f4699fad39c5d0aff6, type: 3}
+  BombBonusPrefab: {fileID: 7928861185078144575, guid: 93ae3046ac079ed42b304656359df95f, type: 3}
+  BombBonusSprite: {fileID: 21300000, guid: 795253d58768fc946ad0cf964bd8ac31, type: 3}
+  SideRocketBonusPrefab: {fileID: 7928861185078144575, guid: 5024a774714afee4e91c63eeaecdc57b, type: 3}
+  SideRocketBonusSprite: {fileID: 21300000, guid: e5d7e4769e5b3a1499a5e67cd6927dec, type: 3}
