@@ -1,1 +1,1 @@
-{"TokenToDestroy":2,"AmountOfTokensToDestroy":11,"ObstacleToDestroy":5,"AmountOfObstaclesToDestroy":1,"ScoreToGet":12,"MovesLeft":13,"Board":[8,8,8,8,8,8,8,8,8,8,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}
+{"TokenToDestroy":2,"AmountOfTokensToDestroy":11,"ObstacleToDestroy":5,"AmountOfObstaclesToDestroy":2,"ScoreToGet":12,"MovesLeft":13,"Board":[8,8,8,8,8,8,8,8,8,8,0,0,0,0,0,0,4,4,5,0,4,0,5,6,6,0,4,4,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0]}

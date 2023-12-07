@@ -7,8 +7,8 @@ public class GreenToken : TokenBase
 
     }
 
-    public GreenToken(GameObject gameObject, int indexI, int indexJ)
+    public GreenToken(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
     {
-        Constructor(gameObject, indexI, indexJ);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
     }
 }

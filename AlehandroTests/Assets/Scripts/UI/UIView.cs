@@ -27,10 +27,16 @@ public class UIView : MonoBehaviour
         SetInitials();
     }
 
+    public void onbuttonclick()
+    {
+
+    }
+
     private void UpdateScoreValue(int value)
     {
         _scoreTMP.text = "Score : " + value.ToString();
-        _scoreIMG.fillAmount = value / _goalsManager._targetScore;
+        if (_goalsManager._targetScore > 0)
+            _scoreIMG.fillAmount = (float)value / _goalsManager._targetScore;
     }
 
     private void UpdateMovesLeftValue(int value)
@@ -56,7 +62,7 @@ public class UIView : MonoBehaviour
         _goalsManager.OnAmountOfObstaclesLeftValueChanged -= UpdateObstaclesToDestroyValue;
     }
 
-    private void SetInitials()
+    public void SetInitials()
     {
         _scoreIMG.transform.parent.gameObject.SetActive(false);
         _movesTMP.gameObject.SetActive(false);
@@ -82,8 +88,7 @@ public class UIView : MonoBehaviour
         if ((_goalsManager._tokenToDestroy > -1)&&(_goalsManager._amountOfTokensToDestroy > 0))
         {
             _tokenIMG.gameObject.SetActive(true);
-            _tokenIMG.sprite = _fieldObjectsPrefabsSO.SpritesDictionary[
-                _fieldObjectsPrefabsSO.GetTypeByID[_goalsManager._tokenToDestroy]];
+            _tokenIMG.sprite = _fieldObjectsPrefabsSO.SpritesDictionaryByID[_goalsManager._tokenToDestroy];
             _tokenTMP.gameObject.SetActive(true);
             _tokenTMP.text = _goalsManager._amountOfTokensToDestroy.ToString();
         }
@@ -91,8 +96,7 @@ public class UIView : MonoBehaviour
         if ((_goalsManager._obstacleToDestroy > -1) && (_goalsManager._amountOfObstaclesToDestroy > 0))
         {
             _obstacleIMG.gameObject.SetActive(true);
-            _obstacleIMG.sprite = _fieldObjectsPrefabsSO.SpritesDictionary[
-                _fieldObjectsPrefabsSO.GetTypeByID[_goalsManager._obstacleToDestroy]];
+            _obstacleIMG.sprite = _fieldObjectsPrefabsSO.SpritesDictionaryByID[_goalsManager._obstacleToDestroy];
             _obstacleTMP.gameObject.SetActive(true);
             _obstacleTMP.text = _goalsManager._amountOfObstaclesToDestroy.ToString();
         }

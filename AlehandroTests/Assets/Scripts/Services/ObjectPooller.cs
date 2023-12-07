@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ObjectPooller
 {
-    private Dictionary<System.Type, object> poolDictionary = new Dictionary<System.Type, object>();
+    private Dictionary<System.Type, Queue<FieldObject>> poolDictionary = new Dictionary<System.Type, Queue<FieldObject>>();
     Dictionary<System.Type, Func<object>> queueFactories = new Dictionary<System.Type, Func<object>>
     {
         { typeof(BlueToken), () => new Queue<BlueToken>() },
@@ -12,59 +12,36 @@ public class ObjectPooller
         { typeof(OrangeToken), () => new Queue<OrangeToken>() },
         { typeof(RedToken), () => new Queue<RedToken>() },
         { typeof(YelowToken), () => new Queue<YelowToken>() },
-        { null, () => null },
+        { typeof(ObstacleIce), () => new Queue<ObstacleIce>() },
+        { typeof(ObstacleRock), () => new Queue<ObstacleRock>() },
+        { typeof(BonusBomb), () => new Queue<BonusBomb>() },
+        { typeof(BonusSideRocket), () => new Queue<BonusSideRocket>() }
     };
     private FieldObjectFactory _factory;
+    private Transform _parentTransform;
 
-    public ObjectPooller(FieldObjectFactory factory)
+    public ObjectPooller(FieldObjectFactory factory, Transform parentTransform)
     {
         _factory = factory;
+        _parentTransform = parentTransform;
     }
 
-    public T GetObject<T>(int indexI, int indexJ, Transform parentTransform) where T : FieldObject, new()
+    public FieldObject GetObjectOfType(Type objectType, int indexI, int indexJ)
     {
-        Queue<T> queueToPoollFrom;
-
-        if (!poolDictionary.ContainsKey(typeof(T)))
-        {
-            poolDictionary.Add(typeof(T), new Queue<T>());
-        }
-
-        queueToPoollFrom = (Queue<T>)poolDictionary[typeof(T)];
-
-        T objectToPool;
-
-        if (queueToPoollFrom.Count == 0)
-        {
-           return _factory.Get<T>(indexI, indexJ, parentTransform);
-        }
-
-        objectToPool = queueToPoollFrom.Dequeue();
-
-        objectToPool.PrefabInstance.SetActive(true);
-        objectToPool.ChangePosition(indexI, indexJ);
-
-        return objectToPool;
-    }
-
-    public FieldObject GetRandomToken(int indexI, int indexJ, Transform parentTransform)
-    {
-        System.Type randomTokenType = FieldObjectsPrefabsSO.GetRandomTokenType();
-
         Queue<FieldObject> queueToPoollFrom;
 
-        if (!poolDictionary.ContainsKey(randomTokenType))
+        if (!poolDictionary.ContainsKey(objectType))
         {
-            poolDictionary.Add(randomTokenType, queueFactories[randomTokenType].Invoke());
+            poolDictionary.Add(objectType, new Queue<FieldObject>());
         }
 
-        queueToPoollFrom = (Queue<FieldObject>)poolDictionary[randomTokenType];
+        queueToPoollFrom = poolDictionary[objectType];
 
         FieldObject objectToPool;
 
         if (queueToPoollFrom.Count == 0)
         {
-            return _factory.GetObjectOfType(randomTokenType, indexI, indexJ, parentTransform);
+            return _factory.GetObjectOfType(objectType, indexI, indexJ, _parentTransform, this);
         }
 
         objectToPool = queueToPoollFrom.Dequeue();
@@ -75,14 +52,11 @@ public class ObjectPooller
         return objectToPool;
     }
 
-    public void ReturnObjectToPool<T>(T objectToReturn) where T :FieldObject
+    public FieldObject GetRandomToken(int indexI, int indexJ)
     {
-        objectToReturn.Reset();
-        objectToReturn.PrefabInstance.SetActive(false);
+        Type randomTokenType = FieldObjectsPrefabsSO.GetRandomTokenType();
 
-        Queue<T> queueReturnTo = (Queue<T>)poolDictionary[typeof(T)];
-
-        queueReturnTo.Enqueue(objectToReturn);
+        return GetObjectOfType(randomTokenType, indexI, indexJ);
     }
 
     public void ReturnObjectToPool(FieldObject objectToReturn)

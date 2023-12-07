@@ -41,6 +41,18 @@ MonoBehaviour:
     m_Address: LevelsContainerSO
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: cf24558526ee58d4e88d162fba6145c9
+    m_Address: InputControllerGO
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e43fbeec58a8c5540af58d1940b95e4c
+    m_Address: VictoryWindow
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 21278cca437d3314e810d60d7dbc1a5b
+    m_Address: GameOverWindow
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: e32514eaee54ea9418553c3f41dc1320, type: 2}
   m_SchemaSet:

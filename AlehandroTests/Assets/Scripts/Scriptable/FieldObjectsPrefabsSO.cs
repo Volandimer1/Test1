@@ -69,7 +69,7 @@ public class FieldObjectsPrefabsSO : ScriptableObject
         {typeof(BonusSideRocket), null }
     };
 
-    public Dictionary<System.Type, Sprite> SpritesDictionary = new Dictionary<System.Type, Sprite>()
+    public Dictionary<System.Type, Sprite> SpritesDictionaryByType = new Dictionary<System.Type, Sprite>()
     {
         {typeof(BlueToken), null },
         {typeof(GreenToken), null },
@@ -82,6 +82,21 @@ public class FieldObjectsPrefabsSO : ScriptableObject
 
         {typeof(BonusBomb), null },
         {typeof(BonusSideRocket), null }
+    };
+
+    public Dictionary<int, Sprite> SpritesDictionaryByID = new Dictionary<int, Sprite>()
+    {
+        {0, null },
+        {1, null },
+        {2, null },
+        {3, null },
+        {4, null },
+
+        {5, null },
+        {6, null },
+
+        {7, null },
+        {8, null }
     };
 
     public static System.Type GetRandomTokenType()
@@ -104,16 +119,25 @@ public class FieldObjectsPrefabsSO : ScriptableObject
         PrefabsDictionary[typeof(BonusBomb)] = BombBonusPrefab;
         PrefabsDictionary[typeof(BonusSideRocket)] = SideRocketBonusPrefab;
 
-        SpritesDictionary[typeof(BlueToken)] = BlueTokenSprite;
-        SpritesDictionary[typeof(GreenToken)] = GreenTokenSprite;
-        SpritesDictionary[typeof(OrangeToken)] = OrangeTokenSprite;
-        SpritesDictionary[typeof(RedToken)] = RedTokenSprite;
-        SpritesDictionary[typeof(YelowToken)] = YelowTokenSprite;
+        SpritesDictionaryByType[typeof(BlueToken)] = BlueTokenSprite;
+        SpritesDictionaryByID[0] = BlueTokenSprite;
+        SpritesDictionaryByType[typeof(GreenToken)] = GreenTokenSprite;
+        SpritesDictionaryByID[1] = GreenTokenSprite;
+        SpritesDictionaryByType[typeof(OrangeToken)] = OrangeTokenSprite;
+        SpritesDictionaryByID[2] = OrangeTokenSprite;
+        SpritesDictionaryByType[typeof(RedToken)] = RedTokenSprite;
+        SpritesDictionaryByID[3] = RedTokenSprite;
+        SpritesDictionaryByType[typeof(YelowToken)] = YelowTokenSprite;
+        SpritesDictionaryByID[4] = YelowTokenSprite;
 
-        SpritesDictionary[typeof(ObstacleIce)] = IceObstacleSprite;
-        SpritesDictionary[typeof(ObstacleRock)] = RockObstacleSprite;
+        SpritesDictionaryByType[typeof(ObstacleIce)] = IceObstacleSprite;
+        SpritesDictionaryByID[5] = IceObstacleSprite;
+        SpritesDictionaryByType[typeof(ObstacleRock)] = RockObstacleSprite;
+        SpritesDictionaryByID[6] = RockObstacleSprite;
 
-        SpritesDictionary[typeof(BonusBomb)] = BombBonusSprite;
-        SpritesDictionary[typeof(BonusSideRocket)] = SideRocketBonusSprite;
+        SpritesDictionaryByType[typeof(BonusBomb)] = BombBonusSprite;
+        SpritesDictionaryByID[7] = BombBonusSprite;
+        SpritesDictionaryByType[typeof(BonusSideRocket)] = SideRocketBonusSprite;
+        SpritesDictionaryByID[8] = SideRocketBonusSprite;
     }
 }

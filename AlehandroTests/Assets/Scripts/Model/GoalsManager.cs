@@ -30,7 +30,7 @@ public class GoalsManager
 
     public GoalsManager(LevelData levelData)
     {
-        Initialize(levelData.TokenToDestroy, levelData.AmountOfTokensToDestroy, levelData.ObstacleToDestroy, levelData.AmountOfObstaclesToDestroy, levelData.ScoreToGet, levelData.MovesLeft);
+        Initialize(levelData);
     }
 
     public void Initialize(int tokenToDestroy, int amountOfTokensToDestroy, int obstacleToDestroy, int amountOfObstaclesToDestroy, int targetScore, int movesLeft)
@@ -42,6 +42,11 @@ public class GoalsManager
         _targetScore = targetScore;
         _movesLeft = movesLeft;
         _scoreValue = 0;
+    }
+
+    public void Initialize(LevelData levelData)
+    {
+        Initialize(levelData.TokenToDestroy, levelData.AmountOfTokensToDestroy, levelData.ObstacleToDestroy, levelData.AmountOfObstaclesToDestroy, levelData.ScoreToGet, levelData.MovesLeft);
     }
 
     public void AddScore(int value)

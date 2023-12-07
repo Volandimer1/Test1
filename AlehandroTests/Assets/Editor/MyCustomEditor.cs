@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using System.Collections.Generic;
-using System.Linq;
-using System;
 
 public class MyCustomEditor : EditorWindow
 {
@@ -42,7 +40,7 @@ public class MyCustomEditor : EditorWindow
             _fieldObjectsSO = AssetDatabase.LoadAssetAtPath<FieldObjectsPrefabsSO>(assetPath);
         }
 
-        _typesList = new List<System.Type>(_fieldObjectsSO.GetTypeByID);
+        _typesList = new List<System.Type>(FieldObjectsPrefabsSO.GetTypeByID);
 
         VisualElement root = rootVisualElement;
 
@@ -57,10 +55,10 @@ public class MyCustomEditor : EditorWindow
         popupTokens = new PopupField<int>("Destroy Tokens", new List<int> { 0, 1, 2, 3, 4, -1 }, 0,
             (int arg) => {
                 if (arg == -1) return "Null";
-                return _fieldObjectsSO.GetTypeByID[arg].Name; },
+                return FieldObjectsPrefabsSO.GetTypeByID[arg].Name; },
             (int arg) => {
                 if (arg == -1) return "Null";
-                return _fieldObjectsSO.GetTypeByID[arg].Name;});
+                return FieldObjectsPrefabsSO.GetTypeByID[arg].Name;});
         popupTokens.RegisterValueChangedCallback(evnt => {
             _levelData.TokenToDestroy = evnt.newValue;
         });
@@ -86,11 +84,11 @@ public class MyCustomEditor : EditorWindow
         popupObstacles = new PopupField<int>("Destroy Obstacles", new List<int> { 5, 6, -1}, 0,
             (int arg) => {
                 if (arg == -1) return "Null";
-                return _fieldObjectsSO.GetTypeByID[arg].Name;
+                return FieldObjectsPrefabsSO.GetTypeByID[arg].Name;
             },
             (int arg) => {
                 if (arg == -1) return "Null";
-                return _fieldObjectsSO.GetTypeByID[arg].Name;
+                return FieldObjectsPrefabsSO.GetTypeByID[arg].Name;
             });
         popupObstacles.RegisterValueChangedCallback(evnt => {
             _levelData.ObstacleToDestroy = evnt.newValue;
@@ -175,7 +173,7 @@ public class MyCustomEditor : EditorWindow
         _RightPane.Add(gridContainer);
 
         leftPane.makeItem = () => new Image();
-        leftPane.bindItem = (item, index) => { (item as Image).sprite = _fieldObjectsSO.SpritesDictionary[_typesList[index]]; };
+        leftPane.bindItem = (item, index) => { (item as Image).sprite = _fieldObjectsSO.SpritesDictionaryByType[_typesList[index]]; };
         leftPane.itemsSource = _typesList;
 
         leftPane.selectedIndex = _SelectedIndex;
@@ -190,7 +188,7 @@ public class MyCustomEditor : EditorWindow
             _levelData.Board[conteinerIndex] = _SelectedIndex;
 
             _containerImageDict[container].sprite = 
-                _fieldObjectsSO.SpritesDictionary[_typesList[_SelectedIndex]];
+                _fieldObjectsSO.SpritesDictionaryByType[_typesList[_SelectedIndex]];
             return;
         }
     }
@@ -202,7 +200,7 @@ public class MyCustomEditor : EditorWindow
         for (int i = 0; i < 45; i++)
         {
             _containerImageDict[_gridOfContainers[i]].sprite =
-                _fieldObjectsSO.SpritesDictionary[_typesList[_levelData.Board[i]]];
+                _fieldObjectsSO.SpritesDictionaryByType[_typesList[_levelData.Board[i]]];
         }
 
         popupTokens.value = _levelData.TokenToDestroy;
@@ -226,14 +224,14 @@ public class MyCustomEditor : EditorWindow
             _levelData.Board[i] = randomindex;
 
             _containerImageDict[_gridOfContainers[i]].sprite =
-                _fieldObjectsSO.SpritesDictionary[_typesList[randomindex]];
+                _fieldObjectsSO.SpritesDictionaryByType[_typesList[randomindex]];
         }
     }
 
     private void AddImageToContainer(VisualElement container)
     {
         Image image = new Image();
-        image.sprite = _fieldObjectsSO.SpritesDictionary[_typesList[0]];
+        image.sprite = _fieldObjectsSO.SpritesDictionaryByType[_typesList[0]];
         image.style.width = container.contentRect.width;
         image.style.height = container.contentRect.height;
         image.style.flexGrow = 1;

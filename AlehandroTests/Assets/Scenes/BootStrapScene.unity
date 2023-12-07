@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _updater: {fileID: 285890671}
+  _config: {fileID: 11400000, guid: 7e9104b92e7426f499a66eb792357fc4, type: 2}
 --- !u!4 &125541202
 Transform:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ public class GameStateMachine
 {
     public Dictionary<Type, IGameState> States { get; private set; }
     private IGameState _currentState;
-    private Updater _updater;
+    public Updater _updater;
 
     public GameStateMachine(Updater updater)
     {

@@ -1,30 +1,30 @@
 [System.Serializable]
-public struct indexes
+public struct Indexes
 {
-    public int i, j;
+    public int Row, Column;
 
-    public indexes(int i, int j)
+    public Indexes(int row, int column)
     {
-        this.i = i;
-        this.j = j;
+        this.Row = row;
+        this.Column = column;
     }
 
     public override bool Equals(System.Object obj)
     {
-        return obj is indexes && this == (indexes)obj;
+        return obj is Indexes && this == (Indexes)obj;
     }
 
     public override int GetHashCode()
     {
-        return System.Tuple.Create(i, j).GetHashCode();
+        return System.Tuple.Create(Row, Column).GetHashCode();
     }
 
-    public static bool operator ==(indexes x, indexes y)
+    public static bool operator ==(Indexes x, Indexes y)
     {
-        return x.i == y.i && x.j == y.j;
+        return x.Row == y.Row && x.Column == y.Column;
     }
 
-    public static bool operator !=(indexes x, indexes y)
+    public static bool operator !=(Indexes x, Indexes y)
     {
         return !(x == y);
     }

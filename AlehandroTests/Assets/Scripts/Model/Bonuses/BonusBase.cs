@@ -1,24 +1,25 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class BonusBase : FieldObject, ISelectable, IDamagable
+public class BonusBase : FieldObject, ISelectable
 {
     private GameObject _particalSystem;
 
     public BonusBase() : base()
     {
-        _particalSystem = new();
+
     }
 
-    public BonusBase(GameObject gameObject, int indexI, int indexJ)
+    public BonusBase(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
     {
-        Constructor(gameObject, indexI, indexJ);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
     }
 
-    public override void Constructor(GameObject gameObject, int indexI, int indexJ)
+    public override void Constructor(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
     {
-        base.Constructor(gameObject, indexI, indexJ);
-        _particalSystem = gameObject.transform.GetChild(0).gameObject;
-        Moovable = true;
+        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        _particalSystem = gameObject.transform.GetChild(1).gameObject;
+        Movable = true;
     }
 
     public void AddToChain()
@@ -31,7 +32,7 @@ public class BonusBase : FieldObject, ISelectable, IDamagable
         _particalSystem.SetActive(false);
     }
 
-    public virtual void TakeDamage()
+    public override void TakeDamage(ref FieldObject[,] fieldObjects, ref List<Indexes> emptyCellsIndexes, ref List<int> indexOfARowForSortInEmptyCells)
     {
 
     }

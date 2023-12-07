@@ -7,8 +7,8 @@ public class OrangeToken : TokenBase
 
     }
 
-    public OrangeToken(GameObject gameObject, int indexI, int indexJ)
+    public OrangeToken(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
     {
-        Constructor(gameObject, indexI, indexJ);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
     }
 }
