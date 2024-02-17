@@ -6,6 +6,7 @@ public class FieldObjectFactory
 {
     private FieldObjectsPrefabsSO _fieldObjectsPrefabs;
     private GoalsManager _goalsManager;
+    private Field _field;
 
     private Dictionary<Type, Func<FieldObject>> typeFactories = new Dictionary<Type, Func<FieldObject>>
     {
@@ -20,13 +21,14 @@ public class FieldObjectFactory
         { typeof(BonusSideRocket), () => new BonusSideRocket() }
     };
 
-    public FieldObjectFactory(FieldObjectsPrefabsSO fieldObjectsPrefabs, GoalsManager goalsManager)
+    public FieldObjectFactory(FieldObjectsPrefabsSO fieldObjectsPrefabs, GoalsManager goalsManager, Field field)
     {
         _fieldObjectsPrefabs = fieldObjectsPrefabs;
         _goalsManager = goalsManager;
+        _field = field;
     }
 
-    public T Get<T>(int indexI, int indexJ, Transform parentTransform, ObjectPooller objectPoller) where T : FieldObject, new()
+    public T Get<T>(int indexI, int indexJ, Transform parentTransform, FieldObjectPooller objectPoller) where T : FieldObject, new()
     {
         if (!_fieldObjectsPrefabs.PrefabsDictionary.ContainsKey(typeof(T)))
         {
@@ -37,12 +39,12 @@ public class FieldObjectFactory
         GameObject prefabInstance = UnityEngine.Object.Instantiate(_fieldObjectsPrefabs.PrefabsDictionary[typeof(T)], parentTransform);
 
         T instanceOfT = new T();
-        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager);
+        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field);
 
         return instanceOfT;
     }
 
-    public FieldObject GetObjectOfType(System.Type fieldObjectType, int indexI, int indexJ, Transform parentTransform, ObjectPooller objectPoller)
+    public FieldObject GetObjectOfType(System.Type fieldObjectType, int indexI, int indexJ, Transform parentTransform, FieldObjectPooller objectPoller)
     {
         if (!_fieldObjectsPrefabs.PrefabsDictionary.ContainsKey(fieldObjectType))
         {
@@ -53,18 +55,18 @@ public class FieldObjectFactory
         GameObject prefabInstance = GameObject.Instantiate(_fieldObjectsPrefabs.PrefabsDictionary[fieldObjectType], parentTransform);
 
         FieldObject instanceOfT = typeFactories[fieldObjectType].Invoke();
-        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager);
+        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field);
 
         return instanceOfT;
     }
 
-    public FieldObject GetRandomToken(int indexI, int indexJ, Transform parentTransform, ObjectPooller objectPoller)
+    public FieldObject GetRandomToken(int indexI, int indexJ, Transform parentTransform, FieldObjectPooller objectPoller)
     {
         System.Type randomTokenType = FieldObjectsPrefabsSO.GetRandomTokenType();
         GameObject prefabInstance = UnityEngine.Object.Instantiate(_fieldObjectsPrefabs.PrefabsDictionary[randomTokenType], parentTransform);
 
         FieldObject instance = typeFactories[randomTokenType].Invoke();
-        instance.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager);
+        instance.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field);
 
         return instance;
     }

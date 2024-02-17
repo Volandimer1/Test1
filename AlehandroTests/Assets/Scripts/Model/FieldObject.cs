@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public abstract class FieldObject : IConstruct
@@ -6,10 +6,8 @@ public abstract class FieldObject : IConstruct
     public Indexes Indexes;
     public GameObject PrefabInstance;
 
-    protected FieldObject[,] _fieldObjects;
-    protected List<Indexes> _emptyCellsIndexes;
-    protected List<int> _indexOfARowForSortInEmptyCells;
-    protected ObjectPooller _objectPoller;
+    protected Field _field;
+    protected FieldObjectPooller _objectPoller;
     protected GoalsManager _goalsManager;
 
     public bool Movable { get; protected set; }
@@ -21,13 +19,14 @@ public abstract class FieldObject : IConstruct
         Movable = false;
     }
 
-    public FieldObject(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public FieldObject(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
     }
 
-    public virtual void Constructor(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public virtual void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
+        _field = field;
         PrefabInstance = gameObject;
         ChangePosition(indexI, indexJ);
 
@@ -35,7 +34,7 @@ public abstract class FieldObject : IConstruct
         _goalsManager = goalsManager;
     }
 
-    public virtual void TakeDamage(ref FieldObject[,] fieldObjects, ref List<Indexes> emptyCellsIndexes, ref List<int> indexOfARowForSortInEmptyCells)
+    public virtual void TakeDamage()
     {
 
     }
@@ -85,8 +84,8 @@ public abstract class FieldObject : IConstruct
     {
         Indexes result = new Indexes();
 
-        result.Column = (int)((position.x + 640 + 160) / 320);
-        result.Row = (int)((position.y - 2720 - 160) / (-320));
+        result.Column = (int)Math.Floor((position.x + 640 + 160) / 320.0);
+        result.Row = (int)Math.Floor((position.y - 2720 - 160) / -320.0);
 
         return result;
     }

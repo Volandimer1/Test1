@@ -12,7 +12,8 @@ public class Field
     public List<int> _indexOfARowForSortInEmptyCells = new List<int>(BoardRows) { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     private FieldGravityLogicService _fieldGravityLogicService;
-    private ObjectPooller _objectPooller;
+    private LightningController _lightningController;
+    private FieldObjectPooller _objectPooller;
     private GoalsManager _goalsManager;
     private GameObject _fieldGameObject;
     private GameObject _fadingPanel;
@@ -22,7 +23,12 @@ public class Field
     private List<Indexes> _chain = new List<Indexes>();
     private List<Indexes> _obstaclesToDamageIndexes = new List<Indexes>();
 
-    public Field(Camera camera, ObjectPooller objectPoller, GoalsManager goalsManager, GameObject fieldGameObject, GameObject fadingPanel, InputController inputController, int[] boardData, Updater updater)
+    public Field()
+    {
+        
+    }
+
+    public void Initialize(Camera camera, FieldObjectPooller objectPoller, GoalsManager goalsManager, GameObject fieldGameObject, GameObject fadingPanel, LightningController lightningController, InputController inputController, int[] boardData, Updater updater)
     {
         _fieldGravityLogicService = new FieldGravityLogicService(this, updater, objectPoller);
 
@@ -30,6 +36,7 @@ public class Field
         _goalsManager = goalsManager;
         _fieldGameObject = fieldGameObject;
         _fadingPanel = fadingPanel;
+        _lightningController = lightningController;
         _camera = camera;
 
         inputController.OnDragEvent += HandleDragEvent;
@@ -47,8 +54,7 @@ public class Field
             {
                 if (_fieldObjects[i, j] != null)
                 {
-                    _objectPooller.ReturnObjectToPool(_fieldObjects[i, j]);
-                    _fieldObjects[i, j] = null;
+                    DeleteFromField(i, j);
                 }
             }
         }
@@ -59,6 +65,12 @@ public class Field
         _fieldGravityLogicService.Reset();
 
         GenerateLevel(boardData);
+    }
+
+    public void DeleteFromField(int row, int column)
+    {
+        _objectPooller.ReturnObjectToPool(_fieldObjects[row, column]);
+        _fieldObjects[row, column] = null;
     }
 
     public static bool InBounds(int i, int j)
@@ -75,7 +87,7 @@ public class Field
         return false;
     }
 
-    public void AddIndexesToSortedList(ref List<Indexes> list, ref List<int> indexesOfARowsInList, Indexes itemToAdd)
+    public void AddIndexesToSortedList(List<Indexes> list, List<int> indexesOfARowsInList, Indexes itemToAdd)
     {
         if (list.Contains(itemToAdd) == false)
         {
@@ -87,13 +99,23 @@ public class Field
         }
     }
 
-    public void RemoveIndexesFromSortedList(ref List<Indexes> list, ref List<int> indexesOfARowsInList, Indexes itemToRemove)
+    public void AddToEmptyCellsIndexes(Indexes itemToAdd)
+    {
+        AddIndexesToSortedList(_emptyCellsIndexes, _indexOfARowForSortInEmptyCells, itemToAdd);
+    }
+
+    public void RemoveFromListOfSortedIndexes(List<Indexes> list, List<int> indexesOfARowsInList, Indexes itemToRemove)
     {
         list.Remove(itemToRemove);
         for (int i = itemToRemove.Row - 1; i > -1; i--)
         {
             indexesOfARowsInList[i]--;
         }
+    }
+
+    public void RemoveFromEmptyCellsIndexes(Indexes itemToRemove)
+    {
+        RemoveFromListOfSortedIndexes(_emptyCellsIndexes, _indexOfARowForSortInEmptyCells, itemToRemove);
     }
 
     private Indexes GetIndexesCursorIsOn(Vector3 position)
@@ -132,7 +154,7 @@ public class Field
 
         Indexes indexesCursorOn = GetIndexesCursorIsOn(position);
 
-        if (!InBounds(indexesCursorOn))
+        if (!InBounds(indexesCursorOn) || (_chain.Count < 1))
             return;
 
         if (indexesCursorOn == _chain[_chain.Count - 1])
@@ -143,6 +165,7 @@ public class Field
             if ((_chain.Count > 1) && (indexesCursorOn == _chain[_chain.Count - 2]))
             {
                 DeselectPreviousObject();
+                _lightningController.RemovePoint();
             }
             else if (CanAddToChain(indexesCursorOn))
             {
@@ -174,12 +197,15 @@ public class Field
         _chain.Add(indexesCursorOn);
         ISelectable objToAddToChain = _fieldObjects[indexesCursorOn.Row, indexesCursorOn.Column] as ISelectable;
         objToAddToChain.AddToChain();
+
+        _lightningController.AddPoint(_fieldObjects[indexesCursorOn.Row, indexesCursorOn.Column].PrefabInstance.transform.position);
     }
 
     private void HandlePointerUpEvent(Vector3 position)
     {
         _fadingPanel.SetActive(false);
         _fadingPanel.transform.SetAsLastSibling();
+        _lightningController.RemoveAll();
 
         if (_chain.Count == 1)
         {
@@ -213,13 +239,13 @@ public class Field
         if (typeof(BonusBase).IsAssignableFrom(objectType))
         {
             _goalsManager.SubtructAmountOfMoves(1);
-            _fieldObjects[_chain[0].Row, _chain[0].Column].TakeDamage(ref _fieldObjects, ref _emptyCellsIndexes, ref _indexOfARowForSortInEmptyCells);
+            _fieldObjects[_chain[0].Row, _chain[0].Column].TakeDamage();
             _chain.Clear();
             _fieldGravityLogicService.StartGravity();
             return true;
         }
 
-        // other cases for single chain here
+        // other cases for single chain
 
         return false;
     }
@@ -232,7 +258,7 @@ public class Field
             _fieldObjects[whereToSpawn.Row, whereToSpawn.Column] =
                 _objectPooller.GetObjectOfType(typeof(BonusSideRocket), whereToSpawn.Row, whereToSpawn.Column);
 
-            RemoveIndexesFromSortedList(ref _emptyCellsIndexes, ref _indexOfARowForSortInEmptyCells, whereToSpawn);
+            RemoveFromEmptyCellsIndexes(whereToSpawn);
         }
 
         if (matchCount > 7)
@@ -240,7 +266,7 @@ public class Field
             _fieldObjects[whereToSpawn.Row, whereToSpawn.Column] =
                 _objectPooller.GetObjectOfType(typeof(BonusBomb), whereToSpawn.Row, whereToSpawn.Column);
 
-            RemoveIndexesFromSortedList(ref _emptyCellsIndexes, ref _indexOfARowForSortInEmptyCells, whereToSpawn);
+            RemoveFromEmptyCellsIndexes(whereToSpawn);
         }
     }
 
@@ -262,7 +288,7 @@ public class Field
             lastInChainIndexes = _chain[_chain.Count - 1];
             AddNearbyObstaclesIndexesToListForDamaging(lastInChainIndexes);
             if (_fieldObjects[lastInChainIndexes.Row, lastInChainIndexes.Column] != null)
-                _fieldObjects[lastInChainIndexes.Row, lastInChainIndexes.Column].TakeDamage(ref _fieldObjects, ref _emptyCellsIndexes, ref _indexOfARowForSortInEmptyCells);
+                _fieldObjects[lastInChainIndexes.Row, lastInChainIndexes.Column].TakeDamage();
             _chain.RemoveAt(_chain.Count - 1);
         }
     }
@@ -274,7 +300,7 @@ public class Field
         {
             lastIndexes = _obstaclesToDamageIndexes[_obstaclesToDamageIndexes.Count - 1];
             if (_fieldObjects[lastIndexes.Row, lastIndexes.Column] != null)
-                _fieldObjects[lastIndexes.Row, lastIndexes.Column].TakeDamage(ref _fieldObjects, ref _emptyCellsIndexes, ref _indexOfARowForSortInEmptyCells);
+                _fieldObjects[lastIndexes.Row, lastIndexes.Column].TakeDamage();
             _obstaclesToDamageIndexes.RemoveAt(_obstaclesToDamageIndexes.Count - 1);
         }
     }

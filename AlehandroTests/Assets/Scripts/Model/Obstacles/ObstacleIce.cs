@@ -7,15 +7,15 @@ public class ObstacleIce : ObstacleBase
 
     }
 
-    public ObstacleIce(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public ObstacleIce(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
         Movable = false;
     }
 
-    public override void Constructor(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public override void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
         Movable = false;
     }
 }

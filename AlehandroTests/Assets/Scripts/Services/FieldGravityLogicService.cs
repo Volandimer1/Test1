@@ -7,14 +7,16 @@ public class FieldGravityLogicService : IUpdatable
 
     private Field _field;
     private Updater _updater;
-    private ObjectPooller _objectPooller;
+    private FieldObjectPooller _objectPooller;
 
     private float movingSpeed = 1.5f;
-    private float _currentAnimationProgress = 0f;
+    private float _currentMovingProgress = 0f;
 
     private List<FieldObject> _movingObjects = new List<FieldObject>();
+    private List<Indexes> emptyUnChecked;
+    private List<int> indexOfARowsInEmptyUnChecked;
 
-    public FieldGravityLogicService(Field field, Updater updater, ObjectPooller objectPooller)
+    public FieldGravityLogicService(Field field, Updater updater, FieldObjectPooller objectPooller)
     {
         _field = field;
         _updater = updater;
@@ -30,7 +32,7 @@ public class FieldGravityLogicService : IUpdatable
 
     public void Reset()
     {
-        _currentAnimationProgress = 0f;
+        _currentMovingProgress = 0f;
         FieldIsMoving = false;
 
         if (_movingObjects.Count > 0)
@@ -46,17 +48,17 @@ public class FieldGravityLogicService : IUpdatable
 
     public void Tick()
     {
-        _currentAnimationProgress += Time.deltaTime * movingSpeed;
-        if (_currentAnimationProgress > 1f) _currentAnimationProgress = 1f;
+        _currentMovingProgress += Time.deltaTime * movingSpeed;
+        if (_currentMovingProgress > 1f) _currentMovingProgress = 1f;
 
         foreach (FieldObject movingObject in _movingObjects)
         {
-            movingObject.MoveToInterpolated(_currentAnimationProgress);
+            movingObject.MoveToInterpolated(_currentMovingProgress);
         }
 
-        if (_currentAnimationProgress >= 1f)
+        if (_currentMovingProgress >= 1f)
         {
-            _currentAnimationProgress = 0f;
+            _currentMovingProgress = 0f;
             FieldIsMoving = false;
 
             AssignNewIndexesAndReferences();
@@ -73,7 +75,17 @@ public class FieldGravityLogicService : IUpdatable
             _updater.RemoveUpdatable(this);
     }
 
-    private bool TryGetMovablesAboveTillCan(Indexes indexesOfEmptyCellToCheckFrom, ref List<Indexes> emptyUnChecked, ref List<int> indexOfARowsInEmptyUnChecked)
+    private void RemoveFromEmptyUnChecked(Indexes itemToRemove)
+    {
+        _field.RemoveFromListOfSortedIndexes(emptyUnChecked, indexOfARowsInEmptyUnChecked, itemToRemove);
+    }
+
+    private void AddToEmptyUnChecked(Indexes itemToAdd)
+    {
+        _field.AddIndexesToSortedList(emptyUnChecked, indexOfARowsInEmptyUnChecked, itemToAdd);
+    }
+
+    private bool TryGetMovablesAboveTillCan(Indexes indexesOfEmptyCellToCheckFrom)
     {
         Indexes indexesOfCurentEmptyCell = indexesOfEmptyCellToCheckFrom;
         bool result = false;
@@ -86,7 +98,7 @@ public class FieldGravityLogicService : IUpdatable
             {
                 _movingObjects.Add(_objectPooller.GetRandomToken(indexesOfCurentEmptyCell.Row - 1, indexesOfCurentEmptyCell.Column));
                 _movingObjects[_movingObjects.Count - 1].SetTarget(indexesOfCurentEmptyCell);
-                _field.RemoveIndexesFromSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesOfEmptyCellToCheckFrom);
+                RemoveFromEmptyUnChecked(indexesOfEmptyCellToCheckFrom);
                 return true;
             }
 
@@ -94,8 +106,8 @@ public class FieldGravityLogicService : IUpdatable
             {
                 if (result == true)
                 {
-                    _field.AddIndexesToSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesOfCurentEmptyCell);
-                    _field.RemoveIndexesFromSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesOfEmptyCellToCheckFrom);
+                    AddToEmptyUnChecked(indexesOfCurentEmptyCell);
+                    RemoveFromEmptyUnChecked(indexesOfEmptyCellToCheckFrom);
                 }
                 return result;
             }
@@ -109,15 +121,15 @@ public class FieldGravityLogicService : IUpdatable
 
     private void GetNewMovables()
     {
-        List<Indexes> emptyUnChecked = new List<Indexes>(_field._emptyCellsIndexes);
-        List<int> indexOfARowsInEmptyUnChecked = new List<int>(_field._indexOfARowForSortInEmptyCells);
+        emptyUnChecked = new List<Indexes>(_field._emptyCellsIndexes);
+        indexOfARowsInEmptyUnChecked = new List<int>(_field._indexOfARowForSortInEmptyCells);
         Indexes indexesOfEmptyCell;
 
         for (int itemCount = 0; itemCount < emptyUnChecked.Count; itemCount++)
         {
             indexesOfEmptyCell = emptyUnChecked[itemCount];
 
-            if (TryGetMovablesAboveTillCan(indexesOfEmptyCell, ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked)) itemCount--;
+            if (TryGetMovablesAboveTillCan(indexesOfEmptyCell)) itemCount--;
         }
 
         for (int itemCount = 0; itemCount < emptyUnChecked.Count; itemCount++)
@@ -129,23 +141,23 @@ public class FieldGravityLogicService : IUpdatable
 
             if (TryGetValidDiagonalMovable(indexesAboveRight, indexesOfEmptyCell))
             {
-                _field.AddIndexesToSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesAboveRight);
-                _field.RemoveIndexesFromSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesOfEmptyCell);
+                AddToEmptyUnChecked(indexesAboveRight);
+                RemoveFromEmptyUnChecked(indexesOfEmptyCell);
                 itemCount--;
-                TryGetMovablesAboveTillCan(indexesAboveRight, ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked);
+                TryGetMovablesAboveTillCan(indexesAboveRight);
                 continue;
             }
 
             if (TryGetValidDiagonalMovable(indexesAboveLeft, indexesOfEmptyCell))
             {
-                _field.AddIndexesToSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesAboveLeft);
-                _field.RemoveIndexesFromSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesOfEmptyCell);
+                AddToEmptyUnChecked(indexesAboveLeft);
+                RemoveFromEmptyUnChecked(indexesOfEmptyCell);
                 itemCount--;
-                TryGetMovablesAboveTillCan(indexesAboveLeft, ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked);
+                TryGetMovablesAboveTillCan(indexesAboveLeft);
                 continue;
             }
 
-            _field.RemoveIndexesFromSortedList(ref emptyUnChecked, ref indexOfARowsInEmptyUnChecked, indexesOfEmptyCell);
+            RemoveFromEmptyUnChecked(indexesOfEmptyCell);
             itemCount--;
         }
     }
@@ -167,14 +179,13 @@ public class FieldGravityLogicService : IUpdatable
         return result;
     }
 
-    private void AddObjectToMovables(Indexes indexesOfObjectToAdd, Indexes targetIndexes)
+    private void AddObjectToMovables(Indexes indexesOfObjectToAdd, Indexes MoveTo)
     {
+        _field._fieldObjects[indexesOfObjectToAdd.Row, indexesOfObjectToAdd.Column].SetTarget(MoveTo);
         _movingObjects.Add(_field._fieldObjects[indexesOfObjectToAdd.Row, indexesOfObjectToAdd.Column]);
-        _field._fieldObjects[indexesOfObjectToAdd.Row, indexesOfObjectToAdd.Column].SetTarget(targetIndexes);
-
+        
         _field._fieldObjects[indexesOfObjectToAdd.Row, indexesOfObjectToAdd.Column] = null;
-
-        _field.AddIndexesToSortedList(ref _field._emptyCellsIndexes, ref _field._indexOfARowForSortInEmptyCells, indexesOfObjectToAdd);
+        _field.AddToEmptyCellsIndexes(indexesOfObjectToAdd);
     }
 
     private void AssignNewIndexesAndReferences()
@@ -185,7 +196,7 @@ public class FieldGravityLogicService : IUpdatable
             movable.Indexes = newindexes;
 
             _field._fieldObjects[newindexes.Row, newindexes.Column] = movable;
-            _field.RemoveIndexesFromSortedList(ref _field._emptyCellsIndexes, ref _field._indexOfARowForSortInEmptyCells, newindexes);
+            _field.RemoveFromEmptyCellsIndexes(newindexes);
         }
     }
 }

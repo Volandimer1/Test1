@@ -1,5 +1,7 @@
+using System.Threading.Tasks;
+
 public interface IGameState
 {
-    void EnterState();
-    void ExitState();
+    Task EnterState();
+    Task ExitState();
 }

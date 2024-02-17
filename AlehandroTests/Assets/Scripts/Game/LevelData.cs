@@ -16,7 +16,7 @@ public class LevelData
 
     public bool WriteToFile(string LevelName)
     {
-        string fullPath = Application.dataPath + "/Data/" + LevelName + ".json";
+        string fullPath = Application.dataPath + "/Resources/Levels/" + LevelName + ".json";
 
         AmountOfObstaclesToDestroy = 0;
         if (ObstacleToDestroy > 0)
@@ -37,7 +37,7 @@ public class LevelData
 
     public bool LoadFromFile(string LevelName)
     {
-        string fullPath = Application.dataPath + "/Data/" + LevelName + ".json";
+        string fullPath = Application.dataPath + "/Resources/Levels/" + LevelName + ".json";
 
         try
         {

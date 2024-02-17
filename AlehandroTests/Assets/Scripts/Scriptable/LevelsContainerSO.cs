@@ -4,5 +4,5 @@ using UnityEngine;
 [CreateAssetMenu]
 public class LevelsContainerSO : ScriptableObject
 {
-    public List<TextAsset> Levels;
+    public List<string> LevelFileNames;
 }

@@ -10,14 +10,14 @@ public class BonusBase : FieldObject, ISelectable
 
     }
 
-    public BonusBase(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public BonusBase(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
     }
 
-    public override void Constructor(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public override void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
         _particalSystem = gameObject.transform.GetChild(1).gameObject;
         Movable = true;
     }
@@ -32,7 +32,7 @@ public class BonusBase : FieldObject, ISelectable
         _particalSystem.SetActive(false);
     }
 
-    public override void TakeDamage(ref FieldObject[,] fieldObjects, ref List<Indexes> emptyCellsIndexes, ref List<int> indexOfARowForSortInEmptyCells)
+    public override void TakeDamage()
     {
 
     }

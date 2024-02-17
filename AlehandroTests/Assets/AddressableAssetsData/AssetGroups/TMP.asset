@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: TMP
+  m_EditorClassIdentifier: 
+  m_GroupName: TMP
+  m_Data:
+    m_SerializedData: []
+  m_GUID: f8eb3cef600a5e24280001dc066b384a
+  m_SerializeEntries:
+  - m_GUID: fade42e8bc714b018fac513c043d323b
+    m_Address: LineBreaking Following Characters
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d82c1b31c7e74239bff1220585707d2b
+    m_Address: LineBreaking Leading Characters
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 3f5b5dff67a942289a9defa416b206f3
+    m_Address: TMP Settings
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 731f1baa9d144a9897cb1d341c2092b8
+    m_Address: Fonts & Materials
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 512a49d95c0c4332bdd98131869c23c9
+    m_Address: Sprite Assets
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4aecb92fff08436c8303b10eab8da368
+    m_Address: Style Sheets
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: e32514eaee54ea9418553c3f41dc1320, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: da8d5998e3dab7845b02f9916437adef, type: 2}
+    - {fileID: 11400000, guid: 681563aa40c540247ba466261f212f2b, type: 2}

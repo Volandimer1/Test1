@@ -8,23 +8,17 @@ public class BonusBomb : BonusBase
 
     }
 
-    public BonusBomb(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public BonusBomb(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
     }
 
-    public override void TakeDamage(ref FieldObject[,] fieldObjects, ref List<Indexes> emptyCellsIndexes,  ref List<int> indexOfARowForSortInEmptyCells)
+    public override void TakeDamage()
     {
-        if (emptyCellsIndexes.Contains(Indexes) == false)
-        {
-            emptyCellsIndexes.Insert(indexOfARowForSortInEmptyCells[Indexes.Row], Indexes);
-            for (int i = Indexes.Row - 1; i > -1; i--)
-            {
-                indexOfARowForSortInEmptyCells[i]++;
-            }
-            _goalsManager.AddScore(5);
-        }
-        fieldObjects[Indexes.Row, Indexes.Column] = null;
+        _field.AddToEmptyCellsIndexes(Indexes);
+        _goalsManager.AddScore(5);
+        
+        _field._fieldObjects[Indexes.Row, Indexes.Column] = null;
 
         int IrangeFrom = Indexes.Row - 2;
         int IrangeTill = Indexes.Row + 3;
@@ -37,8 +31,8 @@ public class BonusBomb : BonusBase
             {
                 if (Field.InBounds(i, j) == false) continue;
 
-                if (fieldObjects[i, j] != null)
-                    fieldObjects[i, j].TakeDamage(ref fieldObjects, ref emptyCellsIndexes, ref indexOfARowForSortInEmptyCells);
+                if (_field._fieldObjects[i, j] != null)
+                    _field._fieldObjects[i, j].TakeDamage();
             }
         }
 

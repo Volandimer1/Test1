@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: SharedAssets
+  m_EditorClassIdentifier: 
+  m_GroupName: SharedAssets
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 099d0dc834599514f864feb9fc2978f3
+  m_SerializeEntries:
+  - m_GUID: dc1d22d009185424cbd5eb07c61ccbcd
+    m_Address: FieldObjectsPrefabsSO
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c15adffcc6785354ba9248cac0b7fcfe
+    m_Address: CanvasCamera
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 55aae59f10bb60c4382116b161905b00
+    m_Address: LevelsContainerSO
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1f2029f86d939384eaa1584c165bbbe0
+    m_Address: LoadingScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4b5455af6f9c89641aff1a80493b2e4c
+    m_Address: OneButtonPopUpCanvas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 023fe238fe5586a4089cc3746dd01784
+    m_Address: TwoButtonsPopUpCanvas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 22501b1167c2ea842b96b765768e961d
+    m_Address: OptionsCanvas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: e32514eaee54ea9418553c3f41dc1320, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 415d5b219ea9f7640996003dfbc78a54, type: 2}
+    - {fileID: 11400000, guid: c563658b18609a64594664f831050f06, type: 2}

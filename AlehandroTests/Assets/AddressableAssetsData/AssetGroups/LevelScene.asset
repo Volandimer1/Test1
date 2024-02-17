@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: LevelScene
+  m_EditorClassIdentifier: 
+  m_GroupName: LevelScene
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 5159b1cf4e56e5b4ca45a677ed65b4b5
+  m_SerializeEntries:
+  - m_GUID: cf24558526ee58d4e88d162fba6145c9
+    m_Address: InputControllerGO
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 3103843bc70abe348b4218036fd3b57e
+    m_Address: UICanvas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6079c1552641bd54fa9fcd462b8acaf3
+    m_Address: FieldCanvas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2cda990e2423bbf4892e6590ba056729
+    m_Address: LevelScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f10f1f6915ea3ef4dac9e4cf1636b511
+    m_Address: LightningRenderer
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: e32514eaee54ea9418553c3f41dc1320, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: d25d5d50e105d594382a59b68183182e, type: 2}
+    - {fileID: 11400000, guid: 003a0ae639e9b274a97d38cefd4e9e41, type: 2}

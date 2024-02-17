@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca60604bef14b5e429b7169e6e093fba, type: 3}
   m_Name: BootConfig
   m_EditorClassIdentifier: 
-  LevelID: 5
+  LevelID: 3

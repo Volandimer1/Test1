@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ObstacleBase : FieldObject 
@@ -11,14 +10,14 @@ public class ObstacleBase : FieldObject
 
     }
 
-    public ObstacleBase(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public ObstacleBase(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
     }
 
-    public override void Constructor(GameObject gameObject, int indexI, int indexJ, ObjectPooller objectPoller, GoalsManager goalsManager)
+    public override void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
     {
-        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager);
+        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
         _cracks = gameObject.transform.GetChild(1).gameObject;
         _health = 2;
     }
@@ -29,7 +28,7 @@ public class ObstacleBase : FieldObject
         _cracks.SetActive(false);
     }
 
-    public override void TakeDamage(ref FieldObject[,] fieldObjects, ref List<Indexes> emptyCellsIndexes,  ref List<int> indexOfARowForSortInEmptyCells)
+    public override void TakeDamage()
     {
         _health--;
         if(_health == 1)
@@ -44,16 +43,9 @@ public class ObstacleBase : FieldObject
                 _goalsManager.AddScore(2);
             }
 
-            if (emptyCellsIndexes.Contains(Indexes) == false)
-            {
-                emptyCellsIndexes.Insert(indexOfARowForSortInEmptyCells[Indexes.Row], Indexes);
-                for (int i = Indexes.Row - 1; i > -1; i--)
-                {
-                    indexOfARowForSortInEmptyCells[i]++;
-                }
-            }
-            _objectPoller.ReturnObjectToPool(this);
-            fieldObjects[Indexes.Row, Indexes.Column] = null;
+            _field.AddToEmptyCellsIndexes(Indexes);
+
+            _field.DeleteFromField(Indexes.Row, Indexes.Column);
         }
     }
 }

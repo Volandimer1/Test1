@@ -1,39 +1,60 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class GameStateMachine
 {
-    public Dictionary<Type, IGameState> States { get; private set; }
+    public Updater Updater;
+    public AudioManager AudioManager;
+    public Dictionary<Type, Func<IGameState>> StateFactories { get; private set; }
+
     private IGameState _currentState;
-    public Updater _updater;
 
-    public GameStateMachine(Updater updater)
+    public GameStateMachine(Updater updater, AudioManager audioManager)
     {
-        _updater = updater;
-        States = new Dictionary<Type, IGameState>();
-        InitializeStates();
+        Updater = updater;
+        AudioManager = audioManager;
+        StateFactories = new Dictionary<Type, Func<IGameState>>();
+        InitializeStateFactories();
     }
 
-    private void InitializeStates()
+    private void InitializeStateFactories()
     {
-        States.Add(typeof(InitializationState), new InitializationState(this));
-        States.Add(typeof(MenuState), new MenuState(this));
-        States.Add(typeof(LevelState), new LevelState(this));
+        StateFactories.Add(typeof(InitializationState), () => new InitializationState(this));
+        StateFactories.Add(typeof(MenuState), () => new MenuState(this));
+        StateFactories.Add(typeof(LevelState), () => new LevelState(this));
     }
 
-    public void TransitionToState<T>() where T : IGameState
+    public async Task TransitionToState<T>() where T : IGameState
     {
         Type stateType = typeof(T);
 
-        if (!States.ContainsKey(stateType))
+        if (!StateFactories.ContainsKey(stateType))
         {
             Debug.LogError($"State of type {stateType.Name} is not registered.");
             return;
         }
 
-        _currentState?.ExitState();
-        _currentState = States[stateType];
-        _currentState?.EnterState();
+        IGameState previousState = _currentState;
+        _currentState = StateFactories[stateType].Invoke();
+
+        if (_currentState != null)
+        {
+            await _currentState.EnterState();
+            previousState?.ExitState();
+        }
+    }
+
+    public async Task TransitionToState(IGameState state)
+    {
+        IGameState previousState = _currentState;
+        _currentState = state;
+
+        if (_currentState != null)
+        {
+            await _currentState.EnterState();
+            previousState?.ExitState();
+        }
     }
 }

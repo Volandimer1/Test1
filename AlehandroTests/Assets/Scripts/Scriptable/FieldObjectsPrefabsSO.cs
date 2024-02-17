@@ -99,13 +99,7 @@ public class FieldObjectsPrefabsSO : ScriptableObject
         {8, null }
     };
 
-    public static System.Type GetRandomTokenType()
-    {
-        int randomind = Random.Range(0, 5);
-        return GetTypeByID[randomind];
-    }
-
-    private void OnValidate()
+    public void Initialize()
     {
         PrefabsDictionary[typeof(BlueToken)] = BlueTokenPrefab;
         PrefabsDictionary[typeof(GreenToken)] = GreenTokenPrefab;
@@ -139,5 +133,11 @@ public class FieldObjectsPrefabsSO : ScriptableObject
         SpritesDictionaryByID[7] = BombBonusSprite;
         SpritesDictionaryByType[typeof(BonusSideRocket)] = SideRocketBonusSprite;
         SpritesDictionaryByID[8] = SideRocketBonusSprite;
+    }
+
+    public static System.Type GetRandomTokenType()
+    {
+        int randomind = Random.Range(0, 5);
+        return GetTypeByID[randomind];
     }
 }

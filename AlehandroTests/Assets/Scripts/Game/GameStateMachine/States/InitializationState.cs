@@ -1,57 +1,48 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.ResourceLocators;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.SceneManagement;
+
 public class InitializationState : IGameState
 {
     private GameStateMachine _gameStateMachine;
-    private int _levelID;
+    private Scene _currentScene;
 
     public InitializationState(GameStateMachine gameStateMachine)
     {
         _gameStateMachine = gameStateMachine;
     }
 
-    public void Initialize(int levelID)
+    public async Task EnterState()
     {
-        _levelID = levelID;
-    }
+        _currentScene = SceneManager.GetActiveScene();
+        await Addressables.InitializeAsync().Task;
 
-    public void EnterState()
-    {
-        Addressables.InitializeAsync().Completed += OnAddressablesInitComplited;
-
-    }
-
-    public void ExitState()
-    {
-        
-    }
-
-    private async void OnAddressablesInitComplited(AsyncOperationHandle<IResourceLocator> obj)
-    {
-        LevelsContainerSO levelsContainerSO;
-
-        AsyncOperationHandle<LevelsContainerSO> handleLevelsContainerSO = Addressables.LoadAssetAsync<LevelsContainerSO>("LevelsContainerSO");
-
-        await handleLevelsContainerSO.Task;
-
-        if (handleLevelsContainerSO.Status != AsyncOperationStatus.Succeeded)
+        if (PlayerPrefs.HasKey("SFXVolume"))
         {
-            Debug.LogError("Failed to load ScriptableObject: " + handleLevelsContainerSO.OperationException);
-            return;
+            _gameStateMachine.AudioManager.SetSFXVolume(PlayerPrefs.GetFloat("SFXVolume"));
+        }
+        else
+        {
+            _gameStateMachine.AudioManager.SetSFXVolume(0.5f);
         }
 
-        levelsContainerSO = handleLevelsContainerSO.Result;
-
-        LevelState levelState = _gameStateMachine.States[typeof(LevelState)] as LevelState;
-
-        if (levelState != null)
+        if (PlayerPrefs.HasKey("MusicVolume"))
         {
-            levelState.Initialize(levelsContainerSO.Levels[_levelID]);
+            _gameStateMachine.AudioManager.SetMusicVolume(PlayerPrefs.GetFloat("MusicVolume"));
         }
-        Addressables.Release(handleLevelsContainerSO);
+        else
+        {
+            _gameStateMachine.AudioManager.SetMusicVolume(0.5f);
+        }
 
-        _gameStateMachine.TransitionToState<LevelState>();
+        _ = _gameStateMachine.TransitionToState<MenuState>();
+    }
+
+    public Task ExitState()
+    {
+        SceneManager.UnloadSceneAsync(_currentScene);
+
+        return Task.CompletedTask;
     }
 }

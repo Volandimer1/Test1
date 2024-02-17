@@ -16,11 +16,13 @@ public class GoalsManager
     public int _targetScore { get; private set; }
     public int _movesLeft { get; private set; }
     private int _scoreValue;
+    private bool _won;
 
     public GoalsManager()
     {
         _tokenToDestroy = -1;
         _obstacleToDestroy = -1;
+        _won = false;
     }
 
     public GoalsManager(int tokenToDestroy, int amountOfTokensToDestroy, int obstacleToDestroy, int amountOfObstaclesToDestroy, int targetScore, int movesLeft)
@@ -42,6 +44,7 @@ public class GoalsManager
         _targetScore = targetScore;
         _movesLeft = movesLeft;
         _scoreValue = 0;
+        _won = false;
     }
 
     public void Initialize(LevelData levelData)
@@ -54,6 +57,7 @@ public class GoalsManager
         _scoreValue += value;
         OnScoreValueChanged?.Invoke(_scoreValue);
 
+        if (_won) return;
         if (WinConditionAchived()) OnVictoryAchived?.Invoke();
     }
 
@@ -63,6 +67,7 @@ public class GoalsManager
         if (_amountOfTokensToDestroy < 0) _amountOfTokensToDestroy = 0;
         OnAmaountOfTokensToDestroyValueChanged?.Invoke(_amountOfTokensToDestroy);
 
+        if (_won) return;
         if (WinConditionAchived()) OnVictoryAchived?.Invoke();
     }
 
@@ -72,6 +77,7 @@ public class GoalsManager
         if (_amountOfObstaclesToDestroy < 0) _amountOfObstaclesToDestroy = 0;
         OnAmountOfObstaclesLeftValueChanged?.Invoke(_amountOfObstaclesToDestroy);
 
+        if (_won) return;
         if (WinConditionAchived()) OnVictoryAchived?.Invoke();
     }
 
@@ -87,8 +93,12 @@ public class GoalsManager
     private bool WinConditionAchived()
     {
         if ((_scoreValue >= _targetScore) &&
-            (((_amountOfTokensToDestroy < 1)&&(_tokenToDestroy > -1)) || (_tokenToDestroy == -1)) &&
-            (((_amountOfObstaclesToDestroy < 1)&&(_obstacleToDestroy > -1)) || (_obstacleToDestroy == -1))) return true;
+            (((_amountOfTokensToDestroy < 1) && (_tokenToDestroy > -1)) || (_tokenToDestroy == -1)) &&
+            (((_amountOfObstaclesToDestroy < 1) && (_obstacleToDestroy > -1)) || (_obstacleToDestroy == -1)))
+        {
+            _won = true;
+            return true; 
+        }
 
         return false;
     }

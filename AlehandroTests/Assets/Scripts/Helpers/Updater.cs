@@ -5,7 +5,7 @@ public class Updater : MonoBehaviour
 {
     private List<IUpdatable> _updatables = new List<IUpdatable>();
 
-    private void Start()
+    private void Awake()
     {
         DontDestroyOnLoad(this);
     }

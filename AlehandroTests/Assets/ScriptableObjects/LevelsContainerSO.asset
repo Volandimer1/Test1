@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c1932406bd28864a8b54f83272c64ba, type: 3}
   m_Name: LevelsContainerSO
   m_EditorClassIdentifier: 
-  Levels:
-  - {fileID: 4900000, guid: e15cd8aef7ceb9546a955158978902e5, type: 3}
-  - {fileID: 4900000, guid: 066f903e5ee1d54468195e6d520e279f, type: 3}
-  - {fileID: 4900000, guid: ba64d1c9dae5607449d92cb209a4a566, type: 3}
-  - {fileID: 4900000, guid: 62f51f9e86c693e429f653653d866966, type: 3}
-  - {fileID: 4900000, guid: 6abf7771ee7046e46a641b5a4fc62b1f, type: 3}
-  - {fileID: 4900000, guid: c7fa5b6cbc428b74896660ff116d512d, type: 3}
+  LevelFileNames:
+  - level_1
+  - level_2
+  - level_3
+  - level_4
+  - level_5
+  - level_6

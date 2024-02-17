@@ -1,40 +1,44 @@
 using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.ResourceManagement.ResourceProviders;
+using System.Threading.Tasks;
+using UnityEngine.UI;
 
 public class LevelState : IGameState
 {
-    private GameStateMachine _gameStateMachine;
+    private const float _numberOfAssetsToLoad = 8f;
 
-    AsyncOperationHandle<GameObject> CameraHandle;
-    AsyncOperationHandle<GameObject> UICanvasHandle;
-    AsyncOperationHandle<GameObject> FieldCanvasHandle;
-    AsyncOperationHandle<GameObject> InputControllerGOHandle;
-    AsyncOperationHandle<GameObject> VictoryWindowHandle;
-    AsyncOperationHandle<GameObject> GameOverWindowHandle;
-    AsyncOperationHandle<FieldObjectsPrefabsSO> handleFieldObjectsPrefabsSO;
+    private GameStateMachine _gameStateMachine;
+    private LoadingScreen _loadingScreen;
+    private Scene _newScene;
+    private PopUpService _popUpService;
+
+    private AsyncOperationHandle<GameObject> _cameraHandle;
+    private AsyncOperationHandle<GameObject> _uICanvasHandle;
+    private AsyncOperationHandle<GameObject> _fieldCanvasHandle;
+    private AsyncOperationHandle<GameObject> _lightningRendererHandle;
+    private AsyncOperationHandle<GameObject> _inputControllerGOHandle;
+    private AsyncOperationHandle<FieldObjectsPrefabsSO> _fieldObjectsPrefabsSOHandle;
 
     private AsyncOperationHandle<SceneInstance> sceneHandle;
 
-    private Camera canvasCamera;
-    private Canvas uiCanvas;
-    private Canvas fieldCanvas;
-    private ObjectPooller _objectPooller;
+    private Camera _canvasCamera;
+    private Canvas _uiCanvas;
+    private Canvas _fieldCanvas;
+    private FieldObjectPooller _objectPooller;
     private TextAsset _levelDataFile;
     private InputController _inputController;
+    private LightningController _lightningController;
     private GoalsManager _goalsManager;
     private LevelData _levelData;
     private UIView _uiView;
     private Field _field;
 
-    GameObject _VictoryWindow;
-    GameObject _GameOverWindow;
-
     public LevelState(GameStateMachine gameStateMachine)
     {
+        _popUpService = new PopUpService();
         _gameStateMachine = gameStateMachine;
     }
 
@@ -43,138 +47,198 @@ public class LevelState : IGameState
         _levelDataFile = levelDataFile;
     }
 
-    public void EnterState()
+    public async Task EnterState()
     {
-        Scene PreviousScene = SceneManager.GetActiveScene();
+        _loadingScreen = new LoadingScreen();
+        await _loadingScreen.InstantiateLoader();
 
         sceneHandle = Addressables.LoadSceneAsync("LevelScene", LoadSceneMode.Additive);
-        sceneHandle.Completed += (asyncHandle) =>
-        {
-            if (asyncHandle.Status != AsyncOperationStatus.Succeeded)
-            {
-                Debug.LogError("Failed to load the LevelScene.");
-                return;
-            }
+        await sceneHandle.Task;
 
-            SceneManager.UnloadSceneAsync(PreviousScene);
-            PrepareNewScene();
+        if (sceneHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load the LevelScene.");
+            return;
+        }
+
+        _newScene = sceneHandle.Result.Scene;
+        SceneManager.SetActiveScene(_newScene);
+
+        await PrepareNewScene();
+    }
+
+    public Task ExitState()
+    {
+        _goalsManager.OnVictoryAchived -= VictoryPopUp;
+        _goalsManager.OnGameOver -= GameOverPopUp;
+
+        _inputController.CleanUpSubscriptions();
+        
+        SceneManager.UnloadSceneAsync(_newScene);
+
+        ReleaseHandles();
+
+        Addressables.Release(sceneHandle);
+
+        return Task.CompletedTask;
+    }
+
+    private async Task PrepareNewScene()
+    {
+        LoadAssets();
+
+        await Task.WhenAll(_cameraHandle.Task, _uICanvasHandle.Task, _fieldCanvasHandle.Task, _lightningRendererHandle.Task, 
+            _inputControllerGOHandle.Task, _fieldObjectsPrefabsSOHandle.Task);
+
+        CheckForErrors();
+
+        InitializationProcess();
+
+        _loadingScreen.ResetProgress();
+        _ = _loadingScreen.ReleaseLoaderResources();
+    }
+
+    private void LoadAssets()
+    {
+        _ = LoadAssetViaAdressables("CanvasCamera", ref _cameraHandle);
+        _ = LoadAssetViaAdressables("UICanvas", ref _uICanvasHandle);
+        _ = LoadAssetViaAdressables("FieldCanvas", ref _fieldCanvasHandle);
+        _ = LoadAssetViaAdressables("LightningRenderer", ref _lightningRendererHandle);
+        _ = LoadAssetViaAdressables("InputControllerGO", ref _inputControllerGOHandle);
+
+        _fieldObjectsPrefabsSOHandle = Addressables.LoadAssetAsync<FieldObjectsPrefabsSO>("FieldObjectsPrefabsSO");
+        _fieldObjectsPrefabsSOHandle.Completed += (go) =>
+        {
+            _loadingScreen.AddProgress(1f / _numberOfAssetsToLoad);
         };
     }
 
-    public void ExitState()
+    private Task LoadAssetViaAdressables(string assetName, ref AsyncOperationHandle<GameObject> handle)
     {
-        _goalsManager.OnVictoryAchived -= Victory;
-        _goalsManager.OnGameOver -= GameOver;
-
-        _inputController.CleanUpSubscriptions();
-
-        if (sceneHandle.Result.Scene.isLoaded)
+        handle = Addressables.InstantiateAsync(assetName);
+        handle.Completed += (go) =>
         {
-            SceneManager.UnloadSceneAsync(sceneHandle.Result.Scene);
-        }
+            _loadingScreen.AddProgress(1f / _numberOfAssetsToLoad);
+        };
 
-        Addressables.Release(CameraHandle);
-        Addressables.Release(UICanvasHandle);
-        Addressables.Release(FieldCanvasHandle);
-        Addressables.Release(InputControllerGOHandle);
-        Addressables.Release(VictoryWindowHandle);
-        Addressables.Release(GameOverWindowHandle);
-        Addressables.Release(handleFieldObjectsPrefabsSO);
+        return Task.CompletedTask;
 
-        Addressables.Release(sceneHandle);
+        /*_cameraHandle.GetDownloadStatus().Percent;
+        _cameraHandle.PercentComplete; */
     }
 
-    private async void PrepareNewScene()
+    private void CheckForErrors()
+    {
+        if (_cameraHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load CanvasCamera: " + _cameraHandle.OperationException);
+            return;
+        }
+
+        if (_uICanvasHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load UICanvas: " + _uICanvasHandle.OperationException);
+            return;
+        }
+
+        if (_fieldCanvasHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load FieldCanvas: " + _fieldCanvasHandle.OperationException);
+            return;
+        }
+
+        if (_lightningRendererHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load LightningRenderer: " + _lightningRendererHandle.OperationException);
+            return;
+        }
+
+        if (_inputControllerGOHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load InputControllerGO: " + _inputControllerGOHandle.OperationException);
+            return;
+        }
+
+        if (_fieldObjectsPrefabsSOHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load ScriptableObject: " + _fieldObjectsPrefabsSOHandle.OperationException);
+            return;
+        }
+    }
+
+    private void InitializationProcess()
     {
         FieldObjectsPrefabsSO fieldObjectsPrefabsSO;
+        fieldObjectsPrefabsSO = _fieldObjectsPrefabsSOHandle.Result;
+        fieldObjectsPrefabsSO.Initialize();
 
-        CameraHandle = Addressables.InstantiateAsync("CanvasCamera");
-        UICanvasHandle = Addressables.InstantiateAsync("UICanvas");
-        FieldCanvasHandle = Addressables.InstantiateAsync("FieldCanvas");
-        InputControllerGOHandle = Addressables.InstantiateAsync("InputControllerGO");
-        VictoryWindowHandle = Addressables.InstantiateAsync("VictoryWindow");
-        GameOverWindowHandle = Addressables.InstantiateAsync("GameOverWindow");
-        handleFieldObjectsPrefabsSO = Addressables.LoadAssetAsync<FieldObjectsPrefabsSO>("FieldObjectsPrefabsSO");
+        GameObject cameraObject = _cameraHandle.Result;
+        _canvasCamera = cameraObject.GetComponent<Camera>();
 
-        await CameraHandle.Task;
-        await UICanvasHandle.Task;
-        await FieldCanvasHandle.Task;
-        await InputControllerGOHandle.Task;
-        await VictoryWindowHandle.Task;
-        await GameOverWindowHandle.Task;
-        await handleFieldObjectsPrefabsSO.Task;
-
-        GameObject cameraObject = CameraHandle.Result;
-        canvasCamera = cameraObject.GetComponent<Camera>();
-
-        GameObject uiCanvasObject = UICanvasHandle.Result;
-        uiCanvas = uiCanvasObject.GetComponent<Canvas>();
+        GameObject uiCanvasObject = _uICanvasHandle.Result;
+        _uiCanvas = uiCanvasObject.GetComponent<Canvas>();
+        Button optionButton = _uiCanvas.GetComponentInChildren<Button>();
+        optionButton.onClick.AddListener(() => 
+        {
+            _popUpService.ShowOptionsPopUp(_gameStateMachine, _inputController);
+        });
         _uiView = uiCanvasObject.GetComponent<UIView>();
 
-        GameObject fieldCanvasObject = FieldCanvasHandle.Result;
+        GameObject fieldCanvasObject = _fieldCanvasHandle.Result;
         GameObject fieldObject = fieldCanvasObject.transform.GetChild(0).gameObject;
         GameObject fadingPanel = fieldObject.transform.GetChild(0).gameObject;
-        fieldCanvas = fieldCanvasObject.GetComponent<Canvas>();
+        _fieldCanvas = fieldCanvasObject.GetComponent<Canvas>();
 
-        GameObject InputControllerGO = InputControllerGOHandle.Result;
+        GameObject InputControllerGO = _inputControllerGOHandle.Result;
         _inputController = InputControllerGO.GetComponent<InputController>();
 
-        uiCanvas.worldCamera = canvasCamera;
-        fieldCanvas.worldCamera = canvasCamera;
+        _uiCanvas.worldCamera = _canvasCamera;
+        _fieldCanvas.worldCamera = _canvasCamera;
 
         _levelData = new LevelData();
         _levelData.LoadFromTextAsset(_levelDataFile);
         _goalsManager = new GoalsManager(_levelData);
         _uiView.Initialize(_goalsManager);
 
-        if (handleFieldObjectsPrefabsSO.Status != AsyncOperationStatus.Succeeded)
-        {
-            Debug.LogError("Failed to load ScriptableObject: " + handleFieldObjectsPrefabsSO.OperationException);
-            return;
-        }
+        GameObject lightningObject = _lightningRendererHandle.Result;
+        LineRenderer lineRenderer = lightningObject.GetComponent<LineRenderer>();
+        _lightningController = new LightningController(lineRenderer);
 
-        fieldObjectsPrefabsSO = handleFieldObjectsPrefabsSO.Result;
+        _field = new Field();
+        FieldObjectFactory fieldObjectFactory = new FieldObjectFactory(fieldObjectsPrefabsSO, _goalsManager, _field);
+        _objectPooller = new FieldObjectPooller(fieldObjectFactory, fieldObject.transform);
+        _field.Initialize(_canvasCamera, _objectPooller, _goalsManager, fieldObject, fadingPanel, _lightningController, _inputController, _levelData.Board, _gameStateMachine.Updater);
 
-        FieldObjectFactory fieldObjectFactory = new FieldObjectFactory(fieldObjectsPrefabsSO, _goalsManager);
-        _objectPooller = new ObjectPooller(fieldObjectFactory, fieldObject.transform);
-
-        _field = new Field(canvasCamera, _objectPooller, _goalsManager, fieldObject, fadingPanel, _inputController, _levelData.Board, _gameStateMachine._updater);
-
-        _VictoryWindow = VictoryWindowHandle.Result;
-        _GameOverWindow = GameOverWindowHandle.Result;
-
-        RestartLevelBTN restartVictory = _VictoryWindow.GetComponent<RestartLevelBTN>();
-        restartVictory.Initialize(RestartLevel, _VictoryWindow);
-
-        RestartLevelBTN restartGameOver = _GameOverWindow.GetComponent<RestartLevelBTN>();
-        restartGameOver.Initialize(RestartLevel, _GameOverWindow);
-
-        _VictoryWindow.SetActive(false);
-        _GameOverWindow.SetActive(false);
-
-        _goalsManager.OnVictoryAchived += Victory;
-        _goalsManager.OnGameOver += GameOver;
+        _goalsManager.OnVictoryAchived += VictoryPopUp;
+        _goalsManager.OnGameOver += GameOverPopUp;
     }
 
-    private void RestartLevel(GameObject windowToDeactivate)
+    private void ReleaseHandles()
+    {
+        Addressables.Release(_cameraHandle);
+        Addressables.Release(_uICanvasHandle);
+        Addressables.Release(_fieldCanvasHandle);
+        Addressables.Release(_inputControllerGOHandle);
+        Addressables.Release(_fieldObjectsPrefabsSOHandle);
+    }
+
+    private void VictoryPopUp()
+    {
+        _inputController.Lock();
+        _popUpService.ShowSingleButtonPopUp("GG u won ^_^ u da best!!!", "Restart", RestartLevel);
+    }
+
+    private void GameOverPopUp()
+    {
+        _inputController.Lock();
+        _popUpService.ShowSingleButtonPopUp("U Lost :-(", "Restart", RestartLevel);
+    }
+
+    private void RestartLevel()
     {
         _goalsManager.Initialize(_levelData);
         _uiView.SetInitials();
         _field.ResetLevel(_levelData.Board);
         _inputController.UnLock();
-
-        windowToDeactivate.SetActive(false);
-    }
-
-    private void Victory()
-    {
-        _inputController.Lock();
-        _VictoryWindow.SetActive(true);
-    }
-
-    private void GameOver()
-    {
-        _inputController.Lock();
-        _GameOverWindow.SetActive(true);
     }
 }
