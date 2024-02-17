@@ -1,15 +1,20 @@
-To test app properly - Switch a Build for Android and portrait resolution only (16*9 preferably).
+To test the app properly - Switch a Build for Android and portrait resolution only (16*9 preferably).
 
 or download APK from here - https://drive.google.com/file/d/11q6BaNpElicGfaMfD2xYYM7h-_lSK2QT/view?usp=sharing (compatible with Emulators)
 
-================================================
-     As I understood it, the main goal of the test task was to test the ability to make Custom Editor Windows (u can check it from Tools -> My Custom Editor in the project).
-     To make it more or less worth the actual resume project tried to implement ideas about architecture from K-syndicate and how I understood they do things 
-     (team that has its own courses and YouTube channel, who made Raid Shadow Legends).
-     Didnt bought their courses yet but heard (spoiled) lots about them from their YouTube. Using a single entry point + addressable system to load
-     manually everything for ultimate control over everything. Also added some patterns, systems and services, and some other polishing. 
-     (Fixed Text Mesh Pro to work from Addressables bundles, as well, and don't cause duplicates), and some other stuff.
-================================================
+
+------------------------------------------------
+     As I understood it, the main goal of the test task was to test the ability to make Custom Editor Windows 
+     (u can check it from Tools -> My Custom Editor in the project).
+     
+     To make it more or less worth the actual resume project tried to implement ideas about architecture from K-syndicate and 
+     how I understood they do things (team that has its own courses and YouTube channel, who made Raid Shadow Legends).
+     
+     Didnt bought their courses yet but heard (spoiled) lots about them from their YouTube. Using a single entry point + 
+     addressable system to load manually everything for ultimate control over everything. Also added some patterns, 
+     systems and services, and some other polishing. (Fixed Text Mesh Pro to work from Addressables bundles, as well, 
+     and don't cause duplicates), and some other stuff.
+------------------------------------------------
 
 Test task text -
 "Основная информация
