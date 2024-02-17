@@ -7,6 +7,7 @@ public abstract class FieldObject : IConstruct
     public GameObject PrefabInstance;
 
     protected Field _field;
+    protected AudioManager _audioManager;
     protected FieldObjectPooller _objectPoller;
     protected GoalsManager _goalsManager;
 
@@ -19,14 +20,15 @@ public abstract class FieldObject : IConstruct
         Movable = false;
     }
 
-    public FieldObject(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
+    public FieldObject(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field, AudioManager audioManager)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field, audioManager);
     }
 
-    public virtual void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
+    public virtual void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field, AudioManager audioManager)
     {
         _field = field;
+        _audioManager = audioManager;
         PrefabInstance = gameObject;
         ChangePosition(indexI, indexJ);
 

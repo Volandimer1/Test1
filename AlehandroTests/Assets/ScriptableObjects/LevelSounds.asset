@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b178632af525c141b52a837942c483b, type: 3}
+  m_Name: LevelSounds
+  m_EditorClassIdentifier: 
+  Clips:
+  - {fileID: 8300000, guid: 4ac751da9f987fd438313d4a4ec16b1a, type: 3}
+  - {fileID: 8300000, guid: a41d7a20c368dcc49bc10a7e387cd1e8, type: 3}
+  - {fileID: 8300000, guid: f62cced636872ec43b41b5cc2abfe5ac, type: 3}

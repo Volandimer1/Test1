@@ -8,13 +8,15 @@ public class BonusBomb : BonusBase
 
     }
 
-    public BonusBomb(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
+    public BonusBomb(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field, AudioManager audioManager)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field, audioManager);
     }
 
     public override void TakeDamage()
     {
+        _audioManager.PlaySFX(_audioManager.LoadedSFXClips["hqexplosion"], PrefabInstance.transform);
+
         _field.AddToEmptyCellsIndexes(Indexes);
         _goalsManager.AddScore(5);
         

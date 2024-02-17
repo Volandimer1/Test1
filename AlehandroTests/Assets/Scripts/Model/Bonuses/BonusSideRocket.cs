@@ -8,13 +8,15 @@ public class BonusSideRocket : BonusBase
 
     }
 
-    public BonusSideRocket(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
+    public BonusSideRocket(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field, AudioManager audioManager)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field, audioManager);
     }
 
     public override void TakeDamage()
     {
+        _audioManager.PlaySFX(_audioManager.LoadedSFXClips["tinyrocket"], PrefabInstance.transform);
+
         _field.AddToEmptyCellsIndexes(Indexes);
         _goalsManager.AddScore(3);
 

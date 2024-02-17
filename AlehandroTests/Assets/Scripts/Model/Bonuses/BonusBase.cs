@@ -10,14 +10,14 @@ public class BonusBase : FieldObject, ISelectable
 
     }
 
-    public BonusBase(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
+    public BonusBase(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field, AudioManager audioManager)
     {
-        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
+        Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field, audioManager);
     }
 
-    public override void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field)
+    public override void Constructor(GameObject gameObject, int indexI, int indexJ, FieldObjectPooller objectPoller, GoalsManager goalsManager, Field field, AudioManager audioManager)
     {
-        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field);
+        base.Constructor(gameObject, indexI, indexJ, objectPoller, goalsManager, field, audioManager);
         _particalSystem = gameObject.transform.GetChild(1).gameObject;
         Movable = true;
     }

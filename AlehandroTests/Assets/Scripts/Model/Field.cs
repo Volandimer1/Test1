@@ -15,6 +15,7 @@ public class Field
     private LightningController _lightningController;
     private FieldObjectPooller _objectPooller;
     private GoalsManager _goalsManager;
+    private AudioManager _audioManager;
     private GameObject _fieldGameObject;
     private GameObject _fadingPanel;
     private Camera _camera;
@@ -28,12 +29,14 @@ public class Field
         
     }
 
-    public void Initialize(Camera camera, FieldObjectPooller objectPoller, GoalsManager goalsManager, GameObject fieldGameObject, GameObject fadingPanel, LightningController lightningController, InputController inputController, int[] boardData, Updater updater)
+    public void Initialize(Camera camera, FieldObjectPooller objectPoller, GoalsManager goalsManager, GameObject fieldGameObject, GameObject fadingPanel, 
+        LightningController lightningController, InputController inputController, int[] boardData, Updater updater, AudioManager audioManager)
     {
         _fieldGravityLogicService = new FieldGravityLogicService(this, updater, objectPoller);
 
         _objectPooller = objectPoller;
         _goalsManager = goalsManager;
+        _audioManager = audioManager;
         _fieldGameObject = fieldGameObject;
         _fadingPanel = fadingPanel;
         _lightningController = lightningController;
@@ -187,6 +190,8 @@ public class Field
 
     private void DeselectPreviousObject()
     {
+        _audioManager.PlaySFX(_audioManager.LoadedSFXClips["bubblesound"], _fieldGameObject.transform);
+
         ISelectable objToDeselect = _fieldObjects[_chain[_chain.Count - 1].Row, _chain[_chain.Count - 1].Column] as ISelectable;
         objToDeselect.DeleteFromChain();
         _chain.RemoveAt(_chain.Count - 1);
@@ -194,6 +199,8 @@ public class Field
 
     private void SelectNewObject(Indexes indexesCursorOn)
     {
+        _audioManager.PlaySFX(_audioManager.LoadedSFXClips["bubblesound"], _fieldGameObject.transform);
+
         _chain.Add(indexesCursorOn);
         ISelectable objToAddToChain = _fieldObjects[indexesCursorOn.Row, indexesCursorOn.Column] as ISelectable;
         objToAddToChain.AddToChain();

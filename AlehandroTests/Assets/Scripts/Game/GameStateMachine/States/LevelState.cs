@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class LevelState : IGameState
 {
-    private const float _numberOfAssetsToLoad = 8f;
+    private const float _numberOfAssetsToLoad = 9f;
 
     private GameStateMachine _gameStateMachine;
     private LoadingScreen _loadingScreen;
@@ -21,6 +21,7 @@ public class LevelState : IGameState
     private AsyncOperationHandle<GameObject> _lightningRendererHandle;
     private AsyncOperationHandle<GameObject> _inputControllerGOHandle;
     private AsyncOperationHandle<FieldObjectsPrefabsSO> _fieldObjectsPrefabsSOHandle;
+    private AsyncOperationHandle<SoundClipsBundle> _levelSoundsSOHandle;
 
     private AsyncOperationHandle<SceneInstance> sceneHandle;
 
@@ -35,6 +36,7 @@ public class LevelState : IGameState
     private LevelData _levelData;
     private UIView _uiView;
     private Field _field;
+    private SoundClipsBundle _levelSounds;
 
     public LevelState(GameStateMachine gameStateMachine)
     {
@@ -88,7 +90,7 @@ public class LevelState : IGameState
         LoadAssets();
 
         await Task.WhenAll(_cameraHandle.Task, _uICanvasHandle.Task, _fieldCanvasHandle.Task, _lightningRendererHandle.Task, 
-            _inputControllerGOHandle.Task, _fieldObjectsPrefabsSOHandle.Task);
+            _inputControllerGOHandle.Task, _levelSoundsSOHandle.Task, _fieldObjectsPrefabsSOHandle.Task);
 
         CheckForErrors();
 
@@ -105,6 +107,12 @@ public class LevelState : IGameState
         _ = LoadAssetViaAdressables("FieldCanvas", ref _fieldCanvasHandle);
         _ = LoadAssetViaAdressables("LightningRenderer", ref _lightningRendererHandle);
         _ = LoadAssetViaAdressables("InputControllerGO", ref _inputControllerGOHandle);
+
+        _levelSoundsSOHandle = Addressables.LoadAssetAsync<SoundClipsBundle>("LevelSounds");
+        _levelSoundsSOHandle.Completed += (go) =>
+        {
+            _loadingScreen.AddProgress(1f / _numberOfAssetsToLoad);
+        };
 
         _fieldObjectsPrefabsSOHandle = Addressables.LoadAssetAsync<FieldObjectsPrefabsSO>("FieldObjectsPrefabsSO");
         _fieldObjectsPrefabsSOHandle.Completed += (go) =>
@@ -159,6 +167,12 @@ public class LevelState : IGameState
             return;
         }
 
+        if (_levelSoundsSOHandle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.LogError("Failed to load Level Sounds Scriptable Object " + _levelSoundsSOHandle.OperationException);
+            return;
+        }
+
         if (_fieldObjectsPrefabsSOHandle.Status != AsyncOperationStatus.Succeeded)
         {
             Debug.LogError("Failed to load ScriptableObject: " + _fieldObjectsPrefabsSOHandle.OperationException);
@@ -171,6 +185,9 @@ public class LevelState : IGameState
         FieldObjectsPrefabsSO fieldObjectsPrefabsSO;
         fieldObjectsPrefabsSO = _fieldObjectsPrefabsSOHandle.Result;
         fieldObjectsPrefabsSO.Initialize();
+
+        _levelSounds = _levelSoundsSOHandle.Result;
+        _gameStateMachine.AudioManager.LoadNewClipsBundle(_levelSounds);
 
         GameObject cameraObject = _cameraHandle.Result;
         _canvasCamera = cameraObject.GetComponent<Camera>();
@@ -205,9 +222,9 @@ public class LevelState : IGameState
         _lightningController = new LightningController(lineRenderer);
 
         _field = new Field();
-        FieldObjectFactory fieldObjectFactory = new FieldObjectFactory(fieldObjectsPrefabsSO, _goalsManager, _field);
+        FieldObjectFactory fieldObjectFactory = new FieldObjectFactory(fieldObjectsPrefabsSO, _goalsManager, _field, _gameStateMachine.AudioManager);
         _objectPooller = new FieldObjectPooller(fieldObjectFactory, fieldObject.transform);
-        _field.Initialize(_canvasCamera, _objectPooller, _goalsManager, fieldObject, fadingPanel, _lightningController, _inputController, _levelData.Board, _gameStateMachine.Updater);
+        _field.Initialize(_canvasCamera, _objectPooller, _goalsManager, fieldObject, fadingPanel, _lightningController, _inputController, _levelData.Board, _gameStateMachine.Updater, _gameStateMachine.AudioManager);
 
         _goalsManager.OnVictoryAchived += VictoryPopUp;
         _goalsManager.OnGameOver += GameOverPopUp;
@@ -215,11 +232,14 @@ public class LevelState : IGameState
 
     private void ReleaseHandles()
     {
+        _gameStateMachine.AudioManager.ReleaseSoundClips();
+
         Addressables.Release(_cameraHandle);
         Addressables.Release(_uICanvasHandle);
         Addressables.Release(_fieldCanvasHandle);
         Addressables.Release(_inputControllerGOHandle);
         Addressables.Release(_fieldObjectsPrefabsSOHandle);
+        Addressables.Release(_levelSoundsSOHandle);
     }
 
     private void VictoryPopUp()

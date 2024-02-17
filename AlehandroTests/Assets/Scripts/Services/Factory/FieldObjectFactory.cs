@@ -7,6 +7,7 @@ public class FieldObjectFactory
     private FieldObjectsPrefabsSO _fieldObjectsPrefabs;
     private GoalsManager _goalsManager;
     private Field _field;
+    private AudioManager _audioManager;
 
     private Dictionary<Type, Func<FieldObject>> typeFactories = new Dictionary<Type, Func<FieldObject>>
     {
@@ -21,11 +22,12 @@ public class FieldObjectFactory
         { typeof(BonusSideRocket), () => new BonusSideRocket() }
     };
 
-    public FieldObjectFactory(FieldObjectsPrefabsSO fieldObjectsPrefabs, GoalsManager goalsManager, Field field)
+    public FieldObjectFactory(FieldObjectsPrefabsSO fieldObjectsPrefabs, GoalsManager goalsManager, Field field, AudioManager audioManager)
     {
         _fieldObjectsPrefabs = fieldObjectsPrefabs;
         _goalsManager = goalsManager;
         _field = field;
+        _audioManager = audioManager;
     }
 
     public T Get<T>(int indexI, int indexJ, Transform parentTransform, FieldObjectPooller objectPoller) where T : FieldObject, new()
@@ -39,7 +41,7 @@ public class FieldObjectFactory
         GameObject prefabInstance = UnityEngine.Object.Instantiate(_fieldObjectsPrefabs.PrefabsDictionary[typeof(T)], parentTransform);
 
         T instanceOfT = new T();
-        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field);
+        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field, _audioManager);
 
         return instanceOfT;
     }
@@ -55,7 +57,7 @@ public class FieldObjectFactory
         GameObject prefabInstance = GameObject.Instantiate(_fieldObjectsPrefabs.PrefabsDictionary[fieldObjectType], parentTransform);
 
         FieldObject instanceOfT = typeFactories[fieldObjectType].Invoke();
-        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field);
+        instanceOfT.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field, _audioManager);
 
         return instanceOfT;
     }
@@ -66,7 +68,7 @@ public class FieldObjectFactory
         GameObject prefabInstance = UnityEngine.Object.Instantiate(_fieldObjectsPrefabs.PrefabsDictionary[randomTokenType], parentTransform);
 
         FieldObject instance = typeFactories[randomTokenType].Invoke();
-        instance.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field);
+        instance.Constructor(prefabInstance, indexI, indexJ, objectPoller, _goalsManager, _field, _audioManager);
 
         return instance;
     }

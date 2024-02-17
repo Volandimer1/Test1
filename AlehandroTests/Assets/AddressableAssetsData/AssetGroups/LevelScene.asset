@@ -37,6 +37,10 @@ MonoBehaviour:
     m_Address: LightningRenderer
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: e7451a7c30f2a0c48a1e0e6b5e142e51
+    m_Address: LevelSounds
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: e32514eaee54ea9418553c3f41dc1320, type: 2}
   m_SchemaSet:
