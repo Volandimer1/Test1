@@ -7,7 +7,7 @@ or download APK from here - https://drive.google.com/file/d/11q6BaNpElicGfaMfD2x
      As I understood it, the main goal of the test task was to test the ability to make Custom Editor Windows 
      (u can check it from Tools -> My Custom Editor in the project).
      
-     To make it more or less worth the actual resume project, I tried to implement ideas about architecture from K-syndicate, and 
+     Also tryed ideas about architecture from K-syndicate, and 
      how I understood they do things (the team that has courses and a YouTube channel, who made Raid Shadow Legends).
      
      Didnt bought their courses yet but heard (spoiled) lots about them from their YouTube. Using a single entry point + 
